@@ -9,6 +9,7 @@ import os
 import time
 import torch
 from PIL import Image
+from PIL import ImageEnhance
 from torchvision import transforms
 
 from config import Configuration
@@ -84,3 +85,18 @@ def classify_image(model_id, img_id):
     img.close()
     time.sleep(5)
     return output
+
+
+def transformation_handle(image, path, color_factor=1.0, brightness_factor=1.0, contrast_factor=1.0,
+                         sharpness_factor=1.0):
+    img = Image.open(image)  # open the image
+    col = ImageEnhance.Color(img)
+    im_col = col.enhance(color_factor)  # set the color factor
+    brh = ImageEnhance.Brightness(im_col)
+    im_col_brh = brh.enhance(brightness_factor)  # set brightness factor to the previous modified image
+    con = ImageEnhance.Contrast(im_col_brh)
+    im_cal_brh_con = con.enhance(contrast_factor)  # set contrast factor to the previous modified image
+    sharp = ImageEnhance.Sharpness(im_cal_brh_con)
+    im_cal_brh_con_sharp = sharp.enhance(sharpness_factor)  # set sharpness factor to the previous modified image
+    # im_cal_brh_con_sharp.show()
+    im_cal_brh_con_sharp.save(path)
