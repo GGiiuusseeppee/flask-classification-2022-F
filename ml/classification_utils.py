@@ -11,7 +11,11 @@ import torch
 from PIL import Image
 from PIL import ImageEnhance
 from torchvision import transforms
-
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import cv2
 from config import Configuration
 
 conf = Configuration()
@@ -41,7 +45,7 @@ def get_model(model_id):
     if model_id in conf.models:
         try:
             module = importlib.import_module('torchvision.models')
-            return module.__getattribute__(model_id)(pretrained=True)
+            return module.__getattribute__(model_id)(weights='DEFAULT')
         except ImportError:
             logging.error("Model {} not found".format(model_id))
     else:
@@ -87,6 +91,7 @@ def classify_image(model_id, img_id):
     return output
 
 
+
 def transformation_handle(image, path, color_factor=1.0, brightness_factor=1.0, contrast_factor=1.0,
                          sharpness_factor=1.0):
     img = Image.open(image)  # open the image
@@ -100,3 +105,32 @@ def transformation_handle(image, path, color_factor=1.0, brightness_factor=1.0, 
     im_cal_brh_con_sharp = sharp.enhance(sharpness_factor)  # set sharpness factor to the previous modified image
     # im_cal_brh_con_sharp.show()
     im_cal_brh_con_sharp.save(path)
+
+def plt_histo(path, histo_path):
+    img = cv2.imread(path)
+    if img is None:
+        print(f"Failed to load image from path: {path}")
+    # You might want to exit the script if the image fails to load
+    else:
+        vals = img.mean(axis=2).flatten()
+        counts, bins = np.histogram(vals, range(257))
+        plt.clf()
+        plt.bar(bins[:-1] - 0.5, counts, width=1, edgecolor='b')
+        plt.xlim([-0.5, 255.5])
+        #plt.show()
+        saved_image = plt.savefig(histo_path)
+        plt.clf()
+        return saved_image
+
+def plot_histo_clr(path, histo_path):
+    im = cv2.imread(path)
+    color = ('b', 'g', 'r')
+    for i, col in enumerate(color):
+        histr = cv2.calcHist([im], [i], None, [256], [0, 256])
+        plt.plot(histr, color=col)
+        plt.xlim([0, 256])
+    #plt.show()
+    saved_img_clr = plt.savefig(histo_path)
+    plt.clf()
+    return saved_img_clr
+
