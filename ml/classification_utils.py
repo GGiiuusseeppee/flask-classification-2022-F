@@ -10,7 +10,11 @@ import time
 import torch
 from PIL import Image
 from torchvision import transforms
-
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import cv2
 from config import Configuration
 
 conf = Configuration()
@@ -40,7 +44,7 @@ def get_model(model_id):
     if model_id in conf.models:
         try:
             module = importlib.import_module('torchvision.models')
-            return module.__getattribute__(model_id)(pretrained=True)
+            return module.__getattribute__(model_id)(weights='DEFAULT')
         except ImportError:
             logging.error("Model {} not found".format(model_id))
     else:
@@ -84,3 +88,31 @@ def classify_image(model_id, img_id):
     img.close()
     time.sleep(5)
     return output
+
+def plt_histo(path, histo_path):
+    img = cv2.imread(path)
+    if img is None:
+        print(f"Failed to load image from path: {path}")
+    # You might want to exit the script if the image fails to load
+    else:
+        vals = img.mean(axis=2).flatten()
+        counts, bins = np.histogram(vals, range(257))
+        plt.clf()
+        plt.bar(bins[:-1] - 0.5, counts, width=1, edgecolor='b')
+        plt.xlim([-0.5, 255.5])
+        #plt.show()
+        saved_image = plt.savefig(histo_path)
+        plt.clf()
+        return saved_image
+
+def plot_histo_clr(path, histo_path):
+    im = cv2.imread(path)
+    color = ('b', 'g', 'r')
+    for i, col in enumerate(color):
+        histr = cv2.calcHist([im], [i], None, [256], [0, 256])
+        plt.plot(histr, color=col)
+        plt.xlim([0, 256])
+    #plt.show()
+    saved_img_clr = plt.savefig(histo_path)
+    plt.clf()
+    return saved_img_clr
