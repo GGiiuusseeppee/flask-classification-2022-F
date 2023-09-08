@@ -10,17 +10,16 @@ from config import Configuration
 config = Configuration()
 
 
-@app.route('/transf', methods=['GET', 'POST'])
+@app.route('/transform', methods=['GET', 'POST'])
 def transform():
-    """API for selecting a model and an image and running a
-    classification job. Returns the output scores from the
-    model."""
+    """API for selecting  an image and running a
+    transformation job. Returns the image transformed"""
     form = TransformationForm()
     if form.validate_on_submit():  # POST
         image_id = form.image.data
         # model_id = form.model.data
-        img_path = f'app/static/imagenet_subset/{image_id}'
-        transformation_img_path = f'app/static/img_transformation/transform_{image_id}'
+        img_path = f'/home/giuseppe/PycharmProjects/flask-classification-2022-F/app/static/imagenet_subset/{image_id}'
+        transformation_img_path = f'/home/giuseppe/PycharmProjects/flask-classification-2022-F//app/static/img_transformation/transform_{image_id}'
 
         color_id = form.color.data
         brightness_id = form.brightness.data

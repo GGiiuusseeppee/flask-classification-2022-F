@@ -71,9 +71,9 @@ def transformation_image(image, color_factor=1.0, brightness_factor=1.0, contras
     sharp = ImageEnhance.Sharpness(im_cal_brh_con)
     im_cal_brh_con_sharp = sharp.enhance(sharpness_factor)  # set sharpness factor to the previous modified image
     im_cal_brh_con_sharp.show()
-    im_cal_brh_con_sharp.save(f'app/static/imagenet_transform/trans_{im_cal_brh_con_sharp}.png')
+    im_cal_brh_con_sharp.save(f'app/static/img_transformation/trans_{im_cal_brh_con_sharp}.png')
 
-img_test = 'app/static/imagenet_subset/n01498041_stingray.JPEG'
-# img.show()
+img_test = 'app/static/imagenet_subset/n02105056_groenendael.JPEG'
+#img.show()
 transformation_image(img_test, color_factor=1.0, brightness_factor=1.3, contrast_factor=1.0, sharpness_factor=3.0)
 # plt.savefig(f'app/static/imagenet_transform/trans_{img_transformed}')
